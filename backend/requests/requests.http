@@ -1,0 +1,15 @@
+### Health Check
+GET http://localhost:3000/api/health
+
+### Listar Usuarios
+GET http://localhost:3000/api/users
+
+### Criar Usuario
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "nome": "Mariana Souza",
+    "email": "mariana.souza@email.com",
+    "senha_hash": "senhaForte123"
+}
