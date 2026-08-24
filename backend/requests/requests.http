@@ -13,3 +13,18 @@ Content-Type: application/json
     "email": "mariana.souza@email.com",
     "senha_hash": "senhaForte123"
 }
+
+### Buscar Usuario por ID
+GET http://localhost:3000/api/users/1
+
+### Atualizar Usuario
+PUT http://localhost:3000/api/users/1
+Content-Type: application/json
+
+{
+  "nome": "Mariana Souza Silva",
+  "email": "mariana.silva@email.com"
+}
+
+### Excluir Usuario
+DELETE http://localhost:3000/api/users/1
