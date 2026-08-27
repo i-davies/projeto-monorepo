@@ -31,6 +31,6 @@ jobs:
               with:
                 node-version: 24
                 cache: 'pnpm'
-                cache-dependecy-path: '**/pnpm-lock.yaml'
+                cache-dependency-path: '**/pnpm-lock.yaml'
 
             
