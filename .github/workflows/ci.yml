@@ -45,6 +45,24 @@ jobs:
               run: |
                 docker build -t api-service:test ./backend
 
+            - name: 7. Validar Frontend (quando presente no monorepo)
+              run: |
+                if [ -d "app"]; then
+                  echo "Subprojeto frontend encontrado. Iniciando validação..."
+                  cd app
+                  pnpm install --frozen-lockfile
+                  pnpm run build
+                  docker build -t app-service:test ./app
+                else 
+                  echo "Subprojeto app ainda não adicionado ao monorepo."
+                fi
+
+            - name: 8. Resumo da execução
+              run: |
+                echo "Integração Continua concluida com sucesso!"
+                echo "Autor da alteração: ${{ github.actor }}"
+                echo "Commit validado: ${{ github.sha }}"
+
             
 
             
