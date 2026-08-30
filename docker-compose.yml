@@ -29,6 +29,9 @@ services:
       - DB_SSL=false
     depends_on:
       - db
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
 
 volumes:
   pgdata:
