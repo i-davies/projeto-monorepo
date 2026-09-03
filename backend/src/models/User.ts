@@ -15,25 +15,25 @@ User.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     nome: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: false,
     },
     email: {
       type: DataTypes.STRING(150),
       allowNull: false,
-      unique: true
+      unique: true,
     },
     senha_hash: {
       type: DataTypes.STRING(255),
-      allowNull: false
-    }
+      allowNull: false,
+    },
   },
   {
     sequelize,
     tableName: 'users',
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
