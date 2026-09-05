@@ -46,16 +46,21 @@ jobs:
           cd backend
           pnpm run format:check
 
-      - name: 7. Validar Tipos e Compliar o Backend (Express)
+      - name: 7. Checagem de Tipos no Backend (tsc --noEmit)
+        run: |
+          cd backend
+          pnpm run type-check
+
+      - name: 8. Validar Tipos e Compliar o Backend (Express)
         run: |
           cd backend
           pnpm run build
 
-      - name: 8. Validar Contrução da Imagem Docker da API
+      - name: 9. Validar Contrução da Imagem Docker da API
         run: |
           docker build -t api-service:test ./backend
 
-      - name: 9. Validar Frontend (quando presente no monorepo)
+      - name: 10. Validar Frontend (quando presente no monorepo)
         run: |
           if [ -d "app"]; then
             echo "Subprojeto frontend encontrado. Iniciando validação..."
@@ -67,7 +72,7 @@ jobs:
             echo "Subprojeto app ainda não adicionado ao monorepo."
           fi
 
-      - name: 10. Resumo da execução
+      - name: 11. Resumo da execução
         run: |
           echo "Integração Continua concluida com sucesso!"
           echo "Autor da alteração: ${{ github.actor }}"
