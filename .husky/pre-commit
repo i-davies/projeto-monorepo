@@ -1,0 +1,2 @@
+pnpm --filter backend run lint
+pnpm --filter backend run type-check

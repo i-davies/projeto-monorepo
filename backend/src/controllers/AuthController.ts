@@ -10,6 +10,8 @@ export class AuthController {
     try {
       const { email, password } = req.body;
 
+      const valorIncorreto: number = 'texto incompativel';
+
       if (!email || !password) {
         return res.status(400).json({ erro: 'Email e senha são obrigatórios' });
       }
