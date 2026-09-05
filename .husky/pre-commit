@@ -1,2 +1,3 @@
 pnpm --filter backend run lint
+pnpm --filter backend run format:check
 pnpm --filter backend run type-check
