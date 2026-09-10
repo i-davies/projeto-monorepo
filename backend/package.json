@@ -12,7 +12,10 @@
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,json,md}\"",
     "format:fix": "prettier --write \"src/**/*.{ts,tsx,js,json,md}\"",
-    "check-all": "pnpm run lint && pnpm run format:check"
+    "check-all": "pnpm run lint && pnpm run format:check",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -39,7 +42,8 @@
     "sequelize-cli": "^6.6.5",
     "tsx": "^4.23.11",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.69.0"
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^5.0.0"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
