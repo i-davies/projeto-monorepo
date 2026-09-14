@@ -29,6 +29,9 @@ services:
       - DB_SSL=false
       - NODE_ENV=development
       - CI=true
+      # Habilitar o polling para detectar alterações de arquivos no windows
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=500
     depends_on:
       - db
     volumes:

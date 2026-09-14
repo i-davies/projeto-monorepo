@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './docs/swagger.json';
 import { sequelize } from './config/database';
 import { appRoutes } from './routes';
 
@@ -21,6 +23,9 @@ app.get('/api/health', (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Rota da documentação interativa
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Registra todas as rotas da aplicacao sob o prefixo /api
 app.use('/api', appRoutes);

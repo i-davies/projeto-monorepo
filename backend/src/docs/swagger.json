@@ -1,0 +1,138 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "LDW Backend API",
+    "version": "1.0.0",
+    "description": "Documentacao interativa da API REST para integracao com o Front-end React"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Servidor Local de Desenvolvimento"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Listar todos os usuarios",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios retornada com sucesso"
+          }
+        }
+      },
+      "post": {
+        "summary": "Cadastrar novo usuario",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuario criado com sucesso" },
+          "400": { "description": "Dados invalidos ou campos ausentes" },
+          "409": { "description": "E-mail ja cadastrado no sistema" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Buscar usuario por ID",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Usuario encontrado" },
+          "404": { "description": "Usuario nao encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Atualizar dados de um usuario",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Usuario atualizado com sucesso" },
+          "404": { "description": "Usuario nao encontrado" }
+        }
+      },
+      "delete": {
+        "summary": "Remover usuario por ID",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Usuario removido com sucesso" },
+          "404": { "description": "Usuario nao encontrado" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "nome": { "type": "string", "example": "Ana Silva" },
+          "email": { "type": "string", "example": "ana.silva@email.com" },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-09-13T10:00:00.000Z"
+          }
+        }
+      },
+      "CreateUserDTO": {
+        "type": "object",
+        "required": ["nome", "email", "password"],
+        "properties": {
+          "nome": { "type": "string", "example": "Ana Silva" },
+          "email": { "type": "string", "example": "ana.silva@email.com" },
+          "password": { "type": "string", "example": "123456" }
+        }
+      },
+      "UpdateUserDTO": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string", "example": "Ana Silva Atualizada" },
+          "email": { "type": "string", "example": "ana.novo@email.com" }
+        }
+      }
+    }
+  }
+}
