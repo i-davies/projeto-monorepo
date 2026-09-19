@@ -1,0 +1,116 @@
+name: Monorepo CI Pipeline
+
+on:
+  # Dispara automaticamente ao enviar novos commits para a branch main
+  push:
+    branches:
+      - main
+  # Dispara na abertura ou atualização de Pull Requests direcionados para a branch main
+  pull_request:
+    branches:
+      - main
+  # Permite execução manual pelo painel web do Github Actions
+  workflow_dispatch:
+
+# Permite cancelar execuções anteriores na mesma branch se novos commits forem enviados
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1: Validações Estáticas e Testes Unitários Rápidos (Fail-Fast)
+  validacoes-e-testes:
+    name: 1. Qualidade, Tipos e Testes Unitários
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Baixar o código-fonte
+        uses: actions/checkout@v4
+
+      - name: 2. Habilitar o pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: 3. COnfigurar o Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: 4. Instalar Dependências do Backend
+        run: |
+          cd backend
+          pnpm install --frozen-lockfile
+
+      - name: 5. Validar Padronização de Código (ESLint)
+        run: |
+          cd backend
+          pnpm run lint
+
+      - name: 6. Validar Formatação de Arquivos (Prettier)
+        run: |
+          cd backend
+          pnpm run format:check
+
+      - name: 7. Checagem de Tipos no Backend (tsc --noEmit)
+        run: |
+          cd backend
+          pnpm run type-check
+
+      - name: 8. Executar Testes Unitários com Vitest
+        run: |
+          cd backend
+          pnpm run test:run
+
+  # Job 2: Compilação de Produção e Imagens Docker (Só executa se o Job 1 passar)
+  build-e-docker:
+    name: 2. Compilação e Imagens Docker
+    needs: validacoes-e-testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Baixar o código-fonte
+        uses: actions/checkout@v4
+
+      - name: 2. Habilitar o pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: 3. COnfigurar o Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: 4. Instalar Dependências do Backend
+        run: |
+          cd backend
+          pnpm install --frozen-lockfile
+
+      - name: 5. Validar Tipos e Compilar o Backend (Express)
+        run: |
+          cd backend
+          pnpm run build
+
+      - name: 6. Validar Construção da Imagem Docker da API
+        run: |
+          docker build -t api-service:test ./backend
+
+      - name: 7. Validar Frontend (quando presente no monorepo)
+        run: |
+          if [ -d "app"]; then
+            echo "Subprojeto frontend encontrado. Iniciando validação..."
+            cd app
+            pnpm install --frozen-lockfile
+            pnpm run build
+            docker build -t app-service:test ./app
+          else 
+            echo "Subprojeto app ainda não adicionado ao monorepo."
+          fi
+
+      - name: 8. Resumo da Execução
+        run: |
+          echo "### Resumo da Execução do Pipeline de CI" >> $GITHUB_STEP_SUMMARY
+          echo "Integração Contínua concluída com sucesso!" >> $GITHUB_STEP_SUMMARY
+          echo "- Autor: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

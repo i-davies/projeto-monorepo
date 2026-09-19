@@ -4,11 +4,11 @@ on:
   # Dispara automaticamente ao enviar novos commits para a branch main
   push:
     branches:
-      - main
+      - backup
   # Dispara na abertura ou atualização de Pull Request direcionados para a branch main
   pull_request:
     branches:
-      - main
+      - backup
   # Permite execução manual pelo painel web do Github ( aba Actions -> Run workflow)
   workflow_dispatch:
 
