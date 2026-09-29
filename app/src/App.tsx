@@ -112,6 +112,74 @@ export default function App() {
           <strong>Aviso:</strong> {mensagemErro}
         </div>
       )}
+
+      {/* Layout em Grid de 2 Colunas */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 2fr",
+          gap: "32px",
+          alignItems: "start",
+        }}
+      >
+        {/* Coluna 1: Formulário de Cadastro */}
+        <div
+          style={{
+            backgroundColor: "#ffffff",
+            padding: "20px",
+            borderRadius: "10px",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <h2
+            style={{
+              margin: "0 0 16px 0",
+              fontSize: "1.2rem",
+              color: "#374151",
+            }}
+          >
+            Novo Usuário
+          </h2>
+
+          <form onSubmit={handleSubmit}>
+            <Input
+              label="Nome Completo"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Ex: Mariana Silva"
+              required
+            />
+            <Input
+              label="E-mail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="usuario@dominio.com"
+              required
+            />
+            <Input
+              label="Senha de Acesso"
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder="Minimo de 6 caracteres"
+              required
+            />
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              isLoading={enviandoForm}
+            >
+              Cadastrar Usuário
+            </Button>
+          </form>
+        </div>
+
+        {/* Coluna 2: Tabela de Usuários */}
+      </div>
     </div>
   );
 }
