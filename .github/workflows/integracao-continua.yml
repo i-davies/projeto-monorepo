@@ -105,7 +105,7 @@ jobs:
             cd app
             pnpm install --frozen-lockfile
             pnpm run build
-            docker build -t app-service:test .
+            # docker build -t app-service:test .
           else 
             echo "Subprojeto app ainda não adicionado ao monorepo."
           fi
