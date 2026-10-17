@@ -33,7 +33,13 @@ describe('UserController', () => {
   describe('GET /api/users', () => {
     it('deve retornar lista de usuários com status 200', async () => {
       const usuarios = [
-        { id: 1, nome: 'Alice', email: 'alice@email.com', createdAt: '2026-01-01', updatedAt: '2026-01-01' },
+        {
+          id: 1,
+          nome: 'Alice',
+          email: 'alice@email.com',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
       ];
       vi.mocked(User.findAll).mockResolvedValue(usuarios as any);
 
@@ -58,7 +64,12 @@ describe('UserController', () => {
   // ──────────────────────────────────────────────
   describe('GET /api/users/:id', () => {
     it('deve retornar usuário por ID com status 200', async () => {
-      const usuario = { id: 1, nome: 'Alice', email: 'alice@email.com', createdAt: '2026-01-01' };
+      const usuario = {
+        id: 1,
+        nome: 'Alice',
+        email: 'alice@email.com',
+        createdAt: '2026-01-01',
+      };
       vi.mocked(User.findByPk).mockResolvedValue(usuario as any);
 
       const response = await request(app).get('/api/users/1');
@@ -71,14 +82,18 @@ describe('UserController', () => {
       const response = await request(app).get('/api/users/abc');
 
       expect(response.status).toBe(400);
-      expect(response.body.erro).toBe('O ID informado deve ser um numero valido.');
+      expect(response.body.erro).toBe(
+        'O ID informado deve ser um numero valido.',
+      );
     });
 
     it('deve retornar 400 se o ID for zero ou negativo', async () => {
       const response = await request(app).get('/api/users/0');
 
       expect(response.status).toBe(400);
-      expect(response.body.erro).toBe('O ID informado deve ser um numero valido.');
+      expect(response.body.erro).toBe(
+        'O ID informado deve ser um numero valido.',
+      );
     });
 
     it('deve retornar 404 se o usuário não for encontrado', async () => {
@@ -186,7 +201,9 @@ describe('UserController', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body.erro).toBe('A senha deve conter no minimo 6 caracteres.');
+      expect(response.body.erro).toBe(
+        'A senha deve conter no minimo 6 caracteres.',
+      );
     });
 
     it('deve retornar 400 se a senha não for fornecida', async () => {
@@ -196,11 +213,16 @@ describe('UserController', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body.erro).toBe('A senha deve conter no minimo 6 caracteres.');
+      expect(response.body.erro).toBe(
+        'A senha deve conter no minimo 6 caracteres.',
+      );
     });
 
     it('deve retornar 400 se o e-mail já estiver cadastrado', async () => {
-      vi.mocked(User.findOne).mockResolvedValue({ id: 10, email: 'alice@email.com' } as any);
+      vi.mocked(User.findOne).mockResolvedValue({
+        id: 10,
+        email: 'alice@email.com',
+      } as any);
 
       const response = await request(app).post('/api/users').send({
         nome: 'Alice',
@@ -209,7 +231,9 @@ describe('UserController', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body.erro).toBe('Já existe um usuário cadastrado com este e-mail.');
+      expect(response.body.erro).toBe(
+        'Já existe um usuário cadastrado com este e-mail.',
+      );
     });
 
     it('deve retornar 500 em caso de erro inesperado', async () => {
@@ -251,16 +275,22 @@ describe('UserController', () => {
     });
 
     it('deve retornar 400 se o ID for inválido', async () => {
-      const response = await request(app).put('/api/users/abc').send({ nome: 'Alice' });
+      const response = await request(app)
+        .put('/api/users/abc')
+        .send({ nome: 'Alice' });
 
       expect(response.status).toBe(400);
-      expect(response.body.erro).toBe('O ID informado deve ser um numero valido.');
+      expect(response.body.erro).toBe(
+        'O ID informado deve ser um numero valido.',
+      );
     });
 
     it('deve retornar 404 se o usuário não for encontrado', async () => {
       vi.mocked(User.findByPk).mockResolvedValue(null);
 
-      const response = await request(app).put('/api/users/999').send({ nome: 'Alice' });
+      const response = await request(app)
+        .put('/api/users/999')
+        .send({ nome: 'Alice' });
 
       expect(response.status).toBe(404);
       expect(response.body.erro).toBe('Usuário não encontrado.');
@@ -275,7 +305,9 @@ describe('UserController', () => {
       };
       vi.mocked(User.findByPk).mockResolvedValue(mockUser as any);
 
-      const response = await request(app).put('/api/users/1').send({ nome: '   ' });
+      const response = await request(app)
+        .put('/api/users/1')
+        .send({ nome: '   ' });
 
       expect(response.status).toBe(404);
       expect(response.body.erro).toBe('O campo nome deve ser um texto valido.');
@@ -290,7 +322,9 @@ describe('UserController', () => {
       };
       vi.mocked(User.findByPk).mockResolvedValue(mockUser as any);
 
-      const response = await request(app).put('/api/users/1').send({ email: 'email-invalido' });
+      const response = await request(app)
+        .put('/api/users/1')
+        .send({ email: 'email-invalido' });
 
       expect(response.status).toBe(400);
       expect(response.body.erro).toBe('Informe um e-mail valido.');
@@ -304,7 +338,10 @@ describe('UserController', () => {
         save: vi.fn(),
       };
       vi.mocked(User.findByPk).mockResolvedValue(mockUser as any);
-      vi.mocked(User.findOne).mockResolvedValue({ id: 2, email: 'outro@email.com' } as any);
+      vi.mocked(User.findOne).mockResolvedValue({
+        id: 2,
+        email: 'outro@email.com',
+      } as any);
 
       const response = await request(app)
         .put('/api/users/1')
@@ -324,7 +361,10 @@ describe('UserController', () => {
       };
       vi.mocked(User.findByPk).mockResolvedValue(mockUser as any);
       // findOne retorna o próprio usuário (mesmo id)
-      vi.mocked(User.findOne).mockResolvedValue({ id: 1, email: 'alice@email.com' } as any);
+      vi.mocked(User.findOne).mockResolvedValue({
+        id: 1,
+        email: 'alice@email.com',
+      } as any);
 
       const response = await request(app)
         .put('/api/users/1')
@@ -336,7 +376,9 @@ describe('UserController', () => {
     it('deve retornar 500 em caso de erro inesperado', async () => {
       vi.mocked(User.findByPk).mockRejectedValue(new Error('Falha no banco'));
 
-      const response = await request(app).put('/api/users/1').send({ nome: 'Alice' });
+      const response = await request(app)
+        .put('/api/users/1')
+        .send({ nome: 'Alice' });
 
       expect(response.status).toBe(500);
       expect(response.body.erro).toBe('Erro ao atualizar usuário');
@@ -363,7 +405,9 @@ describe('UserController', () => {
       const response = await request(app).delete('/api/users/abc');
 
       expect(response.status).toBe(400);
-      expect(response.body.erro).toBe('O ID informado deve ser um numero valido.');
+      expect(response.body.erro).toBe(
+        'O ID informado deve ser um numero valido.',
+      );
     });
 
     it('deve retornar 404 se o usuário não for encontrado', async () => {

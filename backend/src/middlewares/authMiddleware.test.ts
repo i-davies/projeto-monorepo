@@ -64,7 +64,9 @@ describe('authMiddleware', () => {
     authMiddleware(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ erro: 'Token invalido ou expirado.' });
+    expect(res.json).toHaveBeenCalledWith({
+      erro: 'Token invalido ou expirado.',
+    });
     expect(next).not.toHaveBeenCalled();
   });
 
