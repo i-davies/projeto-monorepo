@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: 1. Baixar o código-fonte
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessário para o SonarQube analisar o histórico de commits
 
       - name: 2. Habilitar o pnpm
         uses: pnpm/action-setup@v4
@@ -62,7 +64,40 @@ jobs:
       - name: 8. Executar Testes Unitários e de Integração com Vitest
         run: |
           cd backend
-          pnpm run test:run
+          pnpm run test:coverage
+        env:
+          NODE_ENV: test
+
+      - name: 9. Executar Análise Estática com SonarQube
+        uses: sonarsource/sonarqube-scan-action@v4
+        with:
+          projectBaseDir: backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: 10. Validar SonarQube Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: 11. Publicar Relatório de Cobertura no Resumo do Job
+        if: always()
+        run: |
+          echo "## Relatório de Cobertura de Código e Análise Estática" >> $GITHUB_STEP_SUMMARY
+          echo "Execução de testes e inspeção estática concluídas para commit \`${{ github.sha }}\`." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Relatório LCOV enviado para o SonarQube com sucesso." >> $GITHUB_STEP_SUMMARY
+          echo "Os relatórios detalhados em HTML foram salvos como artefato desta execução." >> $GITHUB_STEP_SUMMARY
+
+      - name: 12. Salvar Artefatos de Cobertura (HTML e LCOV)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report-backend
+          path: backend/coverage
+          retention-days: 14
 
   # Job 2: Compilação de Produção e Imagens Docker (Só executa se o Job 1 passar)
   build-e-docker:
