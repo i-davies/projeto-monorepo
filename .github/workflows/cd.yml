@@ -1,8 +1,11 @@
 name: Monorepo CD Pipeline (Entrega de Produção)
 
 on:
-  # Dispara exclusivamente ao realizar merge ou push direto na branch principal
-  push:
+  # Dispara automaticamente apenas quando o workflow de CI for concluído na branch main
+  workflow_run:
+    workflows: ["Monorepo CI Pipeline"]
+    types:
+      - completed
     branches:
       - main
   # Permite disparo manual controlado pelo painel web do GitHub Actions
@@ -15,6 +18,8 @@ concurrency:
 jobs:
   publicar-imagem-docker:
     name: 1. Compilar e Publicar Imagem no Docker Hub
+    # Só executa se o pipeline de CI disparado tiver sido concluído com sucesso (ou via disparo manual)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
