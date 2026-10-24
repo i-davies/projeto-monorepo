@@ -1,0 +1,62 @@
+name: Monorepo CD Pipeline (Entrega de Produção)
+
+on:
+  # Dispara exclusivamente ao realizar merge ou push direto na branch principal
+  push:
+    branches:
+      - main
+  # Permite disparo manual controlado pelo painel web do GitHub Actions
+  workflow_dispatch:
+
+concurrency:
+  group: cd-production
+  cancel-in-progress: false
+
+jobs:
+  publicar-imagem-docker:
+    name: 1. Compilar e Publicar Imagem no Docker Hub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout do Código-Fonte
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar QEMU (Suporte a Múltiplas Arquiteturas)
+        uses: docker/setup-qemu-action@v3
+
+      - name: 3. Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 4. Autenticar no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 5. Extrair Metadados e Tags para o Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/fatec-backend-api
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+            type=ref,event=tag
+
+      - name: 6. Compilar e Publicar Imagem (Build and Push com Cache)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 7. Resumo da Entrega no Step Summary
+        run: |
+          echo "### Entrega Contínua Concluída com Sucesso" >> $GITHUB_STEP_SUMMARY
+          echo "- **Registro**: Docker Hub" >> $GITHUB_STEP_SUMMARY
+          echo "- **Imagem Publicada**: \`${{ secrets.DOCKERHUB_USERNAME }}/fatec-backend-api:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit SHA**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY

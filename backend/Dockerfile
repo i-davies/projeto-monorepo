@@ -1,31 +1,54 @@
-# 1. Define a imagem de origem base 
-FROM node:24-alpine
+# ==============================================================================
+# Estágio 1: Build da Aplicação
+# ==============================================================================
+FROM node:20-alpine AS builder
 
-# Configura o diretório global do pnpm
-ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+# Instalação do pnpm globalmente
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# 2. Define diretório de trabalho interno do container
 WORKDIR /app
 
-# 3. Instalar o pnpm globalmente para gerenciar as dependências
-RUN npm install -g pnpm
+# Copia dos manifestos de dependências do backend
+COPY package.json pnpm-lock.yaml* ./
 
-# Desativa a restrição do pnpm 11
-RUN pnpm config set strict-dep-builds false
+# Instalação de todas as dependências (incluindo devDependencies para o build)
+RUN pnpm install --frozen-lockfile
 
-# 4. Copia apenas o manifesto de dependências
-COPY package.json ./
+# Copia do código-fonte e da configuração do TypeScript
+COPY tsconfig.json ./
+COPY src ./src
 
-# 5. Instalar as dependências do projeto
-RUN pnpm install
+# Compilação do TypeScript para JavaScript (gera a pasta dist/)
+RUN pnpm run build
 
-# 6. Copiat todo os restante do código
-COPY . .
+# Remoção das dependências de desenvolvimento para diminuir o tamanho final
+RUN pnpm prune --prod
 
-# 7. Expoe a porta padrão LDW
+# ==============================================================================
+# Estágio 2: Imagem Final de Execução (Produção)
+# ==============================================================================
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Definição do ambiente como produção
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Criação de um usuário do sistema sem privilégios de root para segurança
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nodejs
+
+# Copia dos manifestos, dependências de produção e artefatos compilados
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+
+# Ajuste de permissões para o usuário não-root
+USER nodejs
+
+# Exposição da porta padrão da API
 EXPOSE 3000
 
-# 8. Comando para inicializar a aplicação
-CMD ["pnpm", "dev"]
-
+# Comando de inicialização do servidor compilado
+CMD ["node", "dist/server.js"]
